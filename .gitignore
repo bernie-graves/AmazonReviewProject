@@ -31,3 +31,6 @@ venv/
 
 ## Custom
 data/
+
+## script where passwords are
+mysecrets.py
