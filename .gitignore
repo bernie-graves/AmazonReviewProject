@@ -27,6 +27,8 @@ share/python-wheels/
 *.egg
 MANIFEST
 venv/
+worker-venv/
+dashboard-venv/
 
 
 ## Custom
