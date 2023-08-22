@@ -33,6 +33,8 @@ dashboard-venv/
 
 ## Custom
 data/
+.env
+
 
 ## script where passwords are
 mysecrets.py
