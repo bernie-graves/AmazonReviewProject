@@ -104,7 +104,7 @@ class AmazonReviewsSpider(scrapy.Spider):
 
         # after 10 pages amazon disables next page of reviews
         # work around: sort by stars after these 10 pages get ~100 extra reviews pper new sort
-        elif self.current_sort < 1:
+        elif self.current_sort < 2:
             self.current_sort += 1
             # get url for sorted reviews to get extra reviews
             url_stars_sorted = f'https://www.amazon.com/product-reviews/{asin}/?{self.sorting_options[self.current_sort]}'
@@ -164,8 +164,8 @@ class AmazonReviewsSpider(scrapy.Spider):
         remove_duplicate_reviews(self.asin)
         product_df = fetch_product(asin=self.asin)
         self.logger.info(f"Product df has {len(product_df)} reviews")
-    #     create_and_upload_wordclouds(product_df, self.asin)
-    #     create_and_upload_sentiment_model(product_df, self.asin)
+        create_and_upload_wordclouds(product_df, self.asin)
+        create_and_upload_sentiment_model(product_df, self.asin)
     
 def process_scrape_request(asin):
     settings = get_project_settings()
@@ -173,6 +173,12 @@ def process_scrape_request(asin):
 
     process.crawl(AmazonReviewsSpider, asin=asin)
     reactor.run()
+
+def run_scrapy_scraper(asin):
+    settings = get_project_settings()
+    process = CrawlerProcess(settings)
+    process.crawl(AmazonReviewsSpider, asin=asin)
+    process.start()
 
 if __name__ == "__main__":
 
