@@ -4,23 +4,22 @@ sys.path.append('./')
 
 from flask import Flask, request, jsonify
 # from amazon_reviews import process_scrape_request, AmazonReviewsSpider
-from amazon.spiders.amazon_reviews import AmazonReviewsSpider
+from amazon.spiders.amazon_reviews import AmazonReviewsSpider, run_scrapy_scraper
 from flask import Flask, request
 from threading import Thread
 from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 from scrapy.signalmanager import dispatcher
+from scrapy import cmdline
 from twisted.internet import reactor
 from scrapy import signals
-import boto3
-import json
 from amazon.mysecrets import secrets
 import mysql.connector
 
 ## imports for celery -- task queue
-from celery import Celery
-from celery import group
-from celery.utils.log import get_task_logger
+from rq import Queue
+from rq.job import Job
+from redis import Redis
 
 from amazon.analysis_pipeline import fetch_product, create_and_upload_wordclouds, create_and_upload_sentiment_model
 
@@ -33,17 +32,14 @@ import logging
 
 app = Flask(__name__)
 
-## configuration for celery task queue
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+## set up for task queue
+redis_conn = Redis(host='localhost', port=6379)
+task_queue = Queue(connection=redis_conn)
 
-logger = get_task_logger(__name__)
 
 # Set up logging for Flask app
 app_logger = logging.getLogger('flask_app')
 app_logger.setLevel(logging.DEBUG)
-
-# setting up client for aws
-lambda_client = boto3.client('lambda', region_name='us-west-1')
 
 project_settings = get_project_settings()
 crawler = CrawlerRunner(settings=project_settings)
@@ -62,7 +58,6 @@ def run_spider(asin):
     if not reactor.running:
         reactor.run()
 
-
 @app.route('/')
 def home():
     return 'Home'
@@ -75,10 +70,13 @@ def test():
 @app.route('/api/start', methods=['PUT'])
 def start_spider():
     asin = request.json['asin']  # Get the asin from the API request
-    Thread(target=run_spider, args=(asin,)).start() # Pass the asin as an argument to run_spider
-    app_logger.debug('Started running spider')
+    # Thread(target=run_spider, args=(asin,)).start() # Pass the asin as an argument to run_spider
+    # app_logger.debug('Started running spider')
 
-    return jsonify({'status': 'success', 'message': 'Spider "amazon_reviews" added to the queue.'}), 202
+    job = task_queue.enqueue(run_scrapy_scraper, asin, job_timeout=3600)
+
+
+    return jsonify({'status': 'success', 'message': f'Spider "amazon_reviews" added to the queue with id {job.id}.'}), 200
 
 @app.route('/api/stop', methods=['POST'])
 def stop_spider():
@@ -148,7 +146,8 @@ def add_product():
         cursor.execute(create_table_query)
 
         # Insert a row with the data from the JSON request
-        insert_query = f'''INSERT INTO {table_name} ({asin_column}, {words_to_exclude_column}, {interested_words_column}, {product_name_column})
+        # replace command will replace if duplicated asin value
+        insert_query = f'''REPLACE INTO {table_name} ({asin_column}, {words_to_exclude_column}, {interested_words_column}, {product_name_column})
                            VALUES (%s, %s, %s, %s)'''
         values = (data[asin_column], data[words_to_exclude_column], data[interested_words_column], data[product_name_column])
         cursor.execute(insert_query, values)

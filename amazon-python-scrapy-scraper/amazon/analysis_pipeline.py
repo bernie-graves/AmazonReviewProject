@@ -35,22 +35,40 @@ db_config = {
 conn = mysql.connector.connect(**db_config)
 
 def remove_duplicate_reviews(asin):
-    # Select the product from the db
     asin_value = asin
 
-    query = f"""DELETE FROM reviews
-                WHERE text IN (
-                    SELECT asin
-                    FROM reviews
-                    WHERE asin = '{asin_value}'
-                    GROUP BY text
-                    HAVING COUNT(*) > 1
-                );"""
+    # # Create a temporary table for duplicate texts
+    # create_temp_table_query = f"""CREATE TEMPORARY TABLE temp_duplicate_texts AS
+    #                              SELECT text
+    #                              FROM reviews
+    #                              WHERE asin = '{asin_value}'
+    #                              GROUP BY text
+    #                              HAVING COUNT(*) > 1;"""
+
+    # # Delete records using the temporary table
+    # delete_query = """DELETE FROM reviews
+    #                   WHERE text IN (SELECT text FROM temp_duplicate_texts);"""
+
+    # # Drop the temporary table
+    # drop_temp_table_query = "DROP TEMPORARY TABLE IF EXISTS temp_duplicate_texts;"
+
+    # remove duplicates 
+    remove_duplicates_query = """DELETE S1 FROM reviews AS S1  
+                                INNER JOIN reviews AS S2   
+                                WHERE S1.id < S2.id AND S1.text = S2.text 
+                                AND S1.asin = S2.asin; """
+
 
     cursor = conn.cursor()
-    cursor.execute(query)
 
-    return
+    cursor.execute(remove_duplicates_query)
+        
+    # Commit the changes to the database
+    conn.commit()
+
+    # Close the cursor
+    cursor.close()
+
 
 def fetch_product(asin):
     # Select the product from the db
