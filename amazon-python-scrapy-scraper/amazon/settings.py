@@ -1,4 +1,8 @@
 import logging
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BOT_NAME = 'amazon'
 
@@ -8,7 +12,7 @@ NEWSPIDER_MODULE = 'amazon.spiders'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
-SCRAPEOPS_API_KEY = 'cd4b7207-f33d-485a-a689-62929cba6afd'
+SCRAPEOPS_API_KEY = os.getenv("SCRAPE_OPS_API_KEY")
 
 SCRAPEOPS_PROXY_ENABLED = True
 SCRAPEOPS_PROXY_SETTINGS = {'country': 'us'}
@@ -38,11 +42,11 @@ DOWNLOADER_MIDDLEWARES = {
 CONCURRENT_REQUESTS = 1
 
 # MySQL database settings
-MYSQL_HOST = 'reviews-db.cawrdqygknxl.us-east-2.rds.amazonaws.com'
+MYSQL_HOST = os.getenv("MYSQL_HOST")
 MYSQL_PORT = 3306
 MYSQL_DATABASE = 'reviews_db'
 MYSQL_USER = 'admin'
-MYSQL_PASSWORD = '#B3rniejr01'
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 
 ITEM_PIPELINES = {
     'amazon.pipelines.DatabasePipeline': 300,
