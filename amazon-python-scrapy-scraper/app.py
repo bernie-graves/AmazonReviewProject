@@ -133,8 +133,6 @@ def add_product():
         table_name = 'product_names'
         id_column = 'id'
         asin_column = 'asin'
-        words_to_exclude_column = 'words_to_exclude'
-        interested_words_column = 'interested_words'
         product_name_column = 'product_name'
 
         # Create the table if it doesn't exist
@@ -143,17 +141,15 @@ def add_product():
         create_table_query = f'''CREATE TABLE IF NOT EXISTS {table_name} (
             {id_column} INT AUTO_INCREMENT PRIMARY KEY,
             {asin_column} VARCHAR(255) NOT NULL,
-            {words_to_exclude_column} VARCHAR(255) NOT NULL,
-            {interested_words_column} VARCHAR(255) NOT NULL,
             {product_name_column} VARCHAR(255) NOT NULL
         )'''
         cursor.execute(create_table_query)
 
         # Insert a row with the data from the JSON request
         # replace command will replace if duplicated asin value
-        insert_query = f'''REPLACE INTO {table_name} ({asin_column}, {words_to_exclude_column}, {interested_words_column}, {product_name_column})
+        insert_query = f'''REPLACE INTO {table_name} ({asin_column}, {product_name_column})
                            VALUES (%s, %s, %s, %s)'''
-        values = (data[asin_column], data[words_to_exclude_column], data[interested_words_column], data[product_name_column])
+        values = (data[asin_column], data[product_name_column])
         cursor.execute(insert_query, values)
 
         connection.commit()

@@ -1,7 +1,7 @@
 /* assets/styles.css */
 .circle {
-    width: 300px;
-    height: 300px;
+    width: 350px;
+    height: 350px;
     border-radius: 50%;
     background-color: lightblue;
     display: flex;
@@ -11,5 +11,12 @@
 }
 
 .circle-text {
-    color: white;
+    color: #00008B;
+}
+
+
+.main-subtitles {
+    color: green;
+    font-size: 25px;
+    padding:2ch;
 }
