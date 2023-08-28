@@ -131,7 +131,8 @@ def create_ratings_plot(df):
 
     # Create the line graph
     fig = px.line(grouped, x='month', y='count', color='rating',
-                labels={'month': 'Month', 'count': 'Number of Ratings'})
+                labels={'month': 'Month', 'count': 'Number of Ratings'},
+                category_orders={'rating': [1, 2, 3, 4, 5]})
     
     return fig
 
@@ -178,6 +179,9 @@ app.title = 'Amazon Reviews Dashboard'
 app.layout = html.Div(
     style={'padding': '20px', 'justify-content': 'center'},
     children = [
+    
+    # style sheet
+    html.Link(href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css", rel="stylesheet"),
 
     html.H1("Amazon Review Dashboard",
             style={'text-align': 'center'}),
@@ -189,12 +193,13 @@ app.layout = html.Div(
                 options=[{'label': product_name, 'value': asin} for product_name, asin in zip(product_names, asins)],
                 placeholder='Select a product',
                 style={'color': 'black', 'padding-left': "20px", 'padding-right': "0px"}
-            ),], width=10), 
+            ),], width=9), 
 
         dbc.Col([
             dbc.Button(html.I(className='bi bi-arrow-clockwise'), id='refresh-button', n_clicks=0, className="me-md-1"),
-            dbc.Button('New Product', id='open-button', n_clicks=0, className="me-md-2"),
-        ], width=2),
+            dbc.Button('New Product', id='open-button', n_clicks=0, className="me-md-1"),
+            dbc.Button('Scrape More', id='scrape-more-button', n_clicks=0, className="me-md-1"),
+        ], width=3),
         
     
     ]),
@@ -214,67 +219,197 @@ app.layout = html.Div(
             ])
         ]),
         dbc.ModalFooter([
+            dcc.Loading(
+                    id="loading-icon",
+                    children=[html.Div([html.Div(id="loading-output")])],
+                    type="circle",
+                    
+                ),
+            html.Div(id="form-result-message"),
+            html.Div(id="form-result-icon", className="", style={"margin-left": "10px"}),
             dbc.Button('Submit', id='submit-button', n_clicks=0),
             dbc.Button('Close', id='close-button', n_clicks=0, className='ml-auto')
         ])
     ], id='form-modal', centered=True, is_open=False),
     html.Div(id='output-container'),
 
-    # div to display what product is selected
-    html.Div(id='selected-product'),
+    # div with all of the figures
+    html.Div([
+        # div to display what product is selected
+        html.Div(id='selected-product', style={"margin": '20px'}),
 
-    dbc.Row([
+        dbc.Row([
 
-        # First Column: Important Words, Review Count and Ratings Graph
-        dbc.Col([
+            # First Row: Important Words, Review Count and Ratings Graph
             dbc.Row([
 
                 dbc.Col([
                     html.Div("Important Words", id="important-words",
                         style={'justify-content': 'center',
-                                 'display':'flex'})
-                ], width=7),
+                                    'display':'flex', 'margin-left': '20px'})
+                ], width=4),
                 dbc.Col([                
                     html.Div("Review-Count", id="review-count",
                         style={'justify-content': 'center',
-                                 'display':'flex'})
-                                 ],
-                     width = 5, style={'align-items': 'center', "display": 'flex'}),            
+                                    'display':'flex'})
+                                    ],
+                        width = 3, className = 'figure'), 
+                dbc.Col([
+                    html.Div("Ratings Graph", id="ratings-graph"),
+                ], width = 5, style={'margin': '0px'}),
+
+                
 
             ]),
-
-            html.Div("Ratings Graph", id="ratings-graph"),
-
-        ], width=7),
-        # Second Column: Wordclouds
-        dbc.Col(html.Div("Wordclouds", id="wordclouds"), width=5),
-    ]),
+            # Second Column: Wordclouds
+            dbc.Row([
+                dbc.Col([
+                    html.Div("Positive Wordcloud", id="pos-wordcloud")
+                ], width = 6, className='figure'),
+                dbc.Col([
+                    html.Div("Negative Wordcloud", id="neg-wordcloud")
+                ], width = 6, className='figure')
+            ]),
+        ]),
+    ], id="figure-div", style={"display":'none'}),
+    
+    # div to display something before product is selected
+    html.Div([
+        html.H3("Select a product or start a scrape request!")
+    ], id="home-placeholder", style={'display':'block', 'padding': '20px'})
 ])
+
+
+
+# callback to submit form - makes request to backend api
+@app.callback(
+    [Output('loading-output', 'className'),
+    Output('form-result-icon', 'className'),
+    Output('form-result-message', 'children')],
+    [Input('submit-button', 'n_clicks')],
+    [State('input-asin', 'value'),
+     State('input-product-name', 'value')]
+)
+def submit_form(n_clicks, asin_value, product_name):
+
+    loading_icon_class = ""
+    result_icon_class = ""
+
+
+    if n_clicks > 0:
+
+        # set class names for loading and result icons after submit is clicked
+        loading_icon_class = ""
+        result_icon_class = ""
+        result_message = ""
+
+
+        if not asin_value or not re.match(r'^[A-Z0-9]{10}$', asin_value):
+            result_icon_class = "fas fa-times-circle"
+            result_message = 'Enter Valid Asin'
+            return loading_icon_class, result_icon_class, result_message
+
+        # Make a request to the Flask API to add the data to the MySQL database
+        add_product_url = 'http://localhost:5000/api/add_product'
+        product_data = {
+            'asin': asin_value,
+            'product_name': product_name
+
+        }
+        try:
+            product_response = requests.post(add_product_url, json=product_data)
+            
+
+            # Make a PUT request to the api URL with JSON data to start scraping 
+            start_scrape_url = 'http://127.0.0.1:5000/api/start'
+            start_data = {'asin': asin_value}
+            start_response = requests.put(start_scrape_url, json=start_data)
+
+            if product_response.status_code == 200 and start_response.status_code == 200:
+                result_icon_class = "fas fa-check-circle"
+                result_message = "Successfully started scraping!"
+            else:
+                result_icon_class = "fas fa-times-circle"
+                result_message = "Failed to start scraping"
+                
+        except Exception as e:
+            result_icon_class = "fas fa-exclamation-triangle"  # Exclamation triangle icon for exceptions
+            result_message = "Failed to connect to server"
+            print("Exception:", str(e))  # Print the exception message for debugging
+
+        return loading_icon_class, result_icon_class, result_message
+
+    else:
+        return "", "", ""
+
+
 
 # callback to show the new product form
 @app.callback(
-    Output('form-modal', 'is_open'),
+    Output('form-modal', 'is_open', allow_duplicate=True),
     [Input('open-button', 'n_clicks'),
-     Input('close-button', 'n_clicks'),
-     Input('submit-button', 'n_clicks')],
-    [State('form-modal', 'is_open')]
+     Input('close-button', 'n_clicks')],
+    [State('form-modal', 'is_open')],
+    prevent_initial_call=True
 )
-def toggle_form_modal(open_clicks, close_clicks, submit_clicks, is_open):
+def toggle_form_modal(open_clicks, close_clicks, is_open):
     if open_clicks or close_clicks:
         return not is_open
-    elif submit_clicks:
-        return False
     return is_open
 
 
 
+# callback to open prefilled with current product form
+@app.callback(
+    [Output('form-modal', 'is_open'),
+     Output('input-asin', 'value', allow_duplicate=True),
+     Output('input-product-name', 'value', allow_duplicate=True)],
+    [Input('scrape-more-button', 'n_clicks'),
+     Input('close-button', 'n_clicks')],
+    [State('form-modal', 'is_open'),
+     State('product-dropdown', 'value'),
+     State("product-dropdown","options")],
+    prevent_initial_call=True
+)
+def toggle_form_modal(scrape_more_clicks, close_clicks, is_open, current_asin, current_product_options):
+
+    # parse out the label from the options based on the asin value
+    selected_product_name = [x['label'] for x in current_product_options if x['value'] == current_asin]
+    if len(selected_product_name) > 0:
+        selected_product_name = selected_product_name[0]
+    else:
+        selected_product_name = None
+
+    if scrape_more_clicks or close_clicks:
+        return not is_open, current_asin, selected_product_name
+
+    return is_open, current_asin, selected_product_name
+
+
+
+# Callback to automatically uppercase ASIN
+@app.callback(
+    Output('input-asin', 'value'),
+    [Input('input-asin', 'value')]
+)
+def update_asin_value(value):
+    if value is not None:
+        return value.upper()
+
+    return ''
+
 # Define the callback to display the selected product
 @app.callback(
-    Output('selected-product', 'children'),
+    [Output('selected-product', 'children'), 
+     Output('figure-div', 'style'),
+     Output('home-placeholder', 'style')],
     [Input('product-dropdown', 'value')],
     [State("product-dropdown","options")]
 )
 def display_selected_product(selected_product_asin, opt):
+
+    fig_div_style = {'display': 'none'}
+    placeholder_div_style = {'display': 'block', "padding": '20px'}
 
     # parse out the label from the options based on the asin value
     selected_product_name = [x['label'] for x in opt if x['value'] == selected_product_asin]
@@ -287,11 +422,19 @@ def display_selected_product(selected_product_asin, opt):
 
     # format product name and asin
     if selected_product_name:
-        product_info.append(html.H3(f'Selected Product: {selected_product_name}'))
-    if selected_product_asin:
-        product_info.append(html.H4(f'ASIN: {selected_product_asin}'))
+        product_info.append(html.H4([html.B("Selected Product:"), f' {selected_product_name}']))
 
-    return html.Div(product_info)
+        # if there is a selected product, hide place holder and show figures
+        fig_div_style = {'display': 'block'}
+        placeholder_div_style = {'display': 'none'}
+    if selected_product_asin:
+        product_info.append(html.H5([html.B("ASIN:"), f' {selected_product_asin}']))
+
+
+    return html.Div(product_info), fig_div_style, placeholder_div_style
+
+
+
     
 
 # callback to refresh products
@@ -308,7 +451,8 @@ def update_dropdown_options(n_clicks):
 
 # Define the callback to update the wordclouds
 @app.callback(
-    Output('wordclouds', 'children'),
+    [Output('pos-wordcloud', 'children'),
+     Output('neg-wordcloud', 'children')],
     [Input('product-dropdown', 'value')]
 )
 def update_wordclouds(asin):
@@ -318,19 +462,24 @@ def update_wordclouds(asin):
 
         wordclouds = []
 
+
+        # placeholders
+        pos_wordcloud = html.Div()
+        neg_wordcloud = html.Div()
+
+
         # check if positive world cloud exists
         if "pos_image_url" in image_urls:
             # check if image url is not none 
             # boto client returns none when cant find object in bucket
             if image_urls["pos_image_url"] is not None:
                 # add positive wordcloud and label to return component
-                pos_wordcloud = html.Div([
+                pos_wordcloud = dbc.Col([
                                 html.Div("Positive Review Wordcloud", className="main-subtitles"),
                                 dcc.Loading(
-                                    html.Img(src=image_urls["pos_image_url"], style={'width': '90%'})
-                                    )], style={'margin-bottom': '20px' }
+                                    html.Img(src=image_urls["pos_image_url"])
+                                    )]
                                 )
-                wordclouds.append(pos_wordcloud)
 
         
         # check if negative world cloud exists
@@ -339,19 +488,17 @@ def update_wordclouds(asin):
             # boto client returns none when cant find object in bucket
             if image_urls["neg_image_url"] is not None:
                 # add negative wordcloud and label to return component
-                neg_wordcloud = html.Div([
-                                html.Div("Negative Review Wordcloud", className="main-subtitles"),
+                neg_wordcloud = dbc.Col([
+                                html.Div("Negative Review Wordcloud", className="main-subtitles",),
                                 dcc.Loading(
-                                    html.Img(src=image_urls["neg_image_url"], style={'width': '90%'})
-                                    )], style={'margin-bottom': '20px'}
+                                    html.Img(src=image_urls["neg_image_url"])
+                                    )]
                                 )
-                wordclouds.append(neg_wordcloud)
-
 
         # Return the image components
-        return wordclouds
+        return pos_wordcloud, neg_wordcloud
     else:
-        return html.Div()
+        return html.Div(), html.Div()
     
 
 # Define the callback to update the important words table
@@ -421,7 +568,10 @@ def update_ratings_graph(asin):
 
     fig = create_ratings_plot(reviews_df)
     graph = html.Div([
-        html.Div('Number of Ratings by Month and Rating', className="main-subtitles"),
+        html.Div('Number of Ratings by Month and Rating', className="main-subtitles",
+                 style={'display': 'flex',
+                        'justify-content': 'center',
+                        'padding-bottom':'0ch'}),
         dcc.Graph(id='rating-counts-plot', figure=fig)
     ])
 
@@ -432,69 +582,7 @@ def update_ratings_graph(asin):
     return graph, review_count_display
 
 
-# callback to submit form - makes request to backend api
-@app.callback(
-    Output('output-container', 'children'),
-    [Input('submit-button', 'n_clicks')],
-    [State('input-asin', 'value'),
-     State('input-product-name', 'value')]
-)
-def submit_form(n_clicks, asin_value, product_name):
-    if n_clicks > 0:
-        if not asin_value or not re.match(r'^[A-Z0-9]{10}$', asin_value):
-            return html.Div([
-                html.H3('Form Submission'),
-                html.P('Invalid ASIN. Please enter a valid ASIN (10 characters, no spaces or special characters).')
-            ])
 
-        # Make a request to the Flask API to add the data to the MySQL database
-        add_product_url = 'http://localhost:5000/api/add_product'
-        product_data = {
-            'asin': asin_value,
-            'product_name': product_name
-
-        }
-        product_response = requests.post(add_product_url, json=product_data)
-        
-
-        # Make a PUT request to the api URL with JSON data to start scraping 
-        start_scrape_url = 'http://127.0.0.1:5000/api/start'
-        start_data = {'asin': asin_value}
-        start_response = requests.put(start_scrape_url, json=start_data)
-
-        if product_response.status_code == 200 and start_response.status_code == 200:
-            return html.Div([
-                html.H3('Form Submission'),
-                html.P('Data successfully added to the database and scraping started.')
-            ])
-        elif product_response.status_code == 200 and start_response.status_code != 200:
-            return html.Div([
-                html.H3('Form Submission'),
-                html.P('Data successfully added to the database but scraping failed to start.')
-            ])
-        elif product_response.status_code != 200 and start_response.status_code == 200:
-            return html.Div([
-                html.H3('Form Submission'),
-                html.P('Data unsuccessfully added to the database but scraping started.')
-            ])
-        else:
-            return html.Div([
-                html.H3('Form Submission'),
-                html.P('Error occurred while adding data to the database and scraping could not start.')
-            ])
-    else:
-        return html.Div()
-
-# Callback to automatically uppercase ASIN
-@app.callback(
-    Output('input-asin', 'value'),
-    [Input('input-asin', 'value')]
-)
-def update_asin_value(value):
-    if value is not None:
-        return value.upper()
-
-    return ''
 
 # Run the Dash app
 if __name__ == '__main__':

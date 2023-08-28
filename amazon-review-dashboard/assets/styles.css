@@ -1,4 +1,10 @@
 /* assets/styles.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tilt+Prism&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap');
+
+
 .circle {
     width: 350px;
     height: 350px;
@@ -16,7 +22,21 @@
 
 
 .main-subtitles {
-    color: green;
+    color: darkblue;
     font-size: 25px;
     padding:2ch;
+    display: flex;
+    justify-content: center;
+    font-family: 'Josefin Sans', sans-serif;
+}
+
+.figure {
+    display: flex;
+    justify-content: center;
+}
+
+
+/* Set the font family for all elements */
+body {
+    font-family: 'Josefin Sans', sans-serif;
 }

@@ -131,7 +131,6 @@ def add_product():
         # Parse the JSON data from the request
         data = request.get_json()
         table_name = 'product_names'
-        id_column = 'id'
         asin_column = 'asin'
         product_name_column = 'product_name'
 
@@ -139,7 +138,6 @@ def add_product():
         connection = get_mysql_connection()
         cursor = connection.cursor()
         create_table_query = f'''CREATE TABLE IF NOT EXISTS {table_name} (
-            {id_column} INT AUTO_INCREMENT PRIMARY KEY,
             {asin_column} VARCHAR(255) NOT NULL,
             {product_name_column} VARCHAR(255) NOT NULL
         )'''
@@ -148,7 +146,7 @@ def add_product():
         # Insert a row with the data from the JSON request
         # replace command will replace if duplicated asin value
         insert_query = f'''REPLACE INTO {table_name} ({asin_column}, {product_name_column})
-                           VALUES (%s, %s, %s, %s)'''
+                           VALUES (%s, %s)'''
         values = (data[asin_column], data[product_name_column])
         cursor.execute(insert_query, values)
 
