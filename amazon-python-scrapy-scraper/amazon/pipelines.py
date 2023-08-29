@@ -62,7 +62,7 @@ class DatabasePipeline:
         host = settings.get('MYSQL_HOST')
         port = settings.get('MYSQL_PORT')
         database = settings.get('MYSQL_DATABASE')
-        user = settings.get('MYSQL_USER')
+        user = "admin"
         password = settings.get('MYSQL_PASSWORD')
         return cls(host, port, database, user, password)
 

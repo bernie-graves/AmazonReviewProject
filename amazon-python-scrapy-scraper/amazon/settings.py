@@ -44,8 +44,8 @@ CONCURRENT_REQUESTS = 1
 # MySQL database settings
 MYSQL_HOST = os.getenv("MYSQL_HOST")
 MYSQL_PORT = 3306
-MYSQL_DATABASE = 'reviews_db'
-MYSQL_USER = 'admin'
+MYSQL_DATABASE = os.getenv("MSQL_DATABASE")
+MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 
 ITEM_PIPELINES = {

@@ -90,9 +90,54 @@ secrets = {
 
 ```
 
+Now we need to open 3 terminals. One to run the backend REST API, another to serve the dashboard and a third as a worker in a task queue that actually handles the scraping (multiple can be opened and run to scrape multiple at a time). These steps will vary slightly between OS's
+
 ### Windows Startup
 
-Windows quickstart
+#### REST API
+
+Open a command prompt and run the following commands to start the API
+
+```bash
+cd amazon-python-scrapy-scraper
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+
+```
+
+#### Worker Terminal
+
+The task queue uses Redis Queue, which isn't available on Windows so you have to install Windows Subsystem for Linux (WSL) and open an Ubuntu terminal using that. You can install WSL [here](https://learn.microsoft.com/en-us/windows/wsl/install) and to open an Ubuntu terminal in VS Code you need to close an reopen the application. When you open the terminal and click on the plus symbol, there should be a WSL option.
+
+After setting up WSL and opening a WSL terminal, run the following:
+
+```bash
+cd amazon-python-scrapy-scraper
+python3 -m venv worker-venv
+source worker-venv/bin/activate
+pip3 install -r requirements.txt
+sudo service redis-server start
+rq worker
+```
+
+This sets up the virtual environment, starts the task queue and opens a worker on this queue.
+
+#### Dashboard Setup
+
+Now to open the Dash Dashboard. Open a Command Prompt window and run the following:
+
+```bash
+cd amazon-review-dashboard
+python -m venv dashboard-venv
+dashboard-venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+
+```
+
+The dashboard will be running on http://127.0.0.1:8050/
 
 ### MacOS and Linux Startup
 

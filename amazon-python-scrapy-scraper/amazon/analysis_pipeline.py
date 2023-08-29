@@ -5,7 +5,12 @@ import boto3
 from io import BytesIO
 from PIL import Image
 import io
-from amazon.mysecrets import secrets
+
+# secrets
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # for sentiment model
 from sklearn.feature_extraction.text import CountVectorizer
@@ -23,18 +28,20 @@ nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Connect to mySQL db
-db_config = {
-    'user': secrets.get("DB_USER"),
-    'password': secrets.get("DB_PASSWORD"),
-    'host': secrets.get("DB_HOST"),
-    'port': secrets.get("DB_PORT"),
-    'database': secrets.get("DATABASE"),
-}
 
-conn = mysql.connector.connect(**db_config)
 
 def remove_duplicate_reviews(asin):
+
+    # Connect to mySQL db
+    db_config = {
+        'user': os.getenv("MYSQL_USER"),
+        'password': os.getenv("MYSQL_PASSWORD"),
+        'host': os.getenv("MYSQL_HOST"),
+        'port': 3306,
+        'database': os.getenv("MSQL_DATABASE"),
+    }
+
+    conn = mysql.connector.connect(**db_config)
     asin_value = asin
 
     # # Create a temporary table for duplicate texts
@@ -71,6 +78,18 @@ def remove_duplicate_reviews(asin):
 
 
 def fetch_product(asin):
+
+    # Connect to mySQL db
+    db_config = {
+        'user': os.getenv("MYSQL_USER"),
+        'password': os.getenv("MYSQL_PASSWORD"),
+        'host': os.getenv("MYSQL_HOST"),
+        'port': 3306,
+        'database': os.getenv("MSQL_DATABASE"),
+    }
+
+    conn = mysql.connector.connect(**db_config)
+
     # Select the product from the db
     asin_value = asin
 

@@ -29,6 +29,7 @@ crochet.setup()
 import logging
 
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -116,11 +117,23 @@ def sentiment_model():
 
 ## request to add product info to the db
 def get_mysql_connection():
+
     connection = mysql.connector.connect(
-        host=secrets.get("DB_HOST"),
-        user=secrets.get("DB_USER"),
-        password=secrets.get("DB_PASSWORD"),
-        database=secrets.get("DATABASE")
+        host=os.getenv("MYSQL_HOST"),
+        user=os.getenv("MYSQL_USER"),
+        password= os.getenv("MYSQL_PASSWORD"),
+        database=os.getenv("MSQL_DATABASE")
+    )
+    return connection
+
+
+## connect to mysql server
+def get_mysql_server_connection():
+
+    connection = mysql.connector.connect(
+        host=os.getenv("MYSQL_HOST"),
+        user=os.getenv("MYSQL_USER"),
+        password= os.getenv("MYSQL_PASSWORD"),
     )
     return connection
 
@@ -159,4 +172,51 @@ def add_product():
 
 
 if __name__ == '__main__':
+
+    
+    conn_server = get_mysql_server_connection()
+    cursor_server = conn_server.cursor()
+
+    # create db if it doesnt exist
+    create_db_query = f'''CREATE DATABASE IF NOT EXISTS {os.getenv("MSQL_DATABASE")};'''
+    cursor_server.execute(create_db_query)
+
+    conn_server.commit()
+    cursor_server.close()
+    conn_server.close()
+
+    # create review table if it doesnt exist
+
+    conn_db = get_mysql_connection()
+    cursor_db = conn_db.cursor()
+
+    create_review_table_query = f'''CREATE TABLE IF NOT EXISTS reviews(
+            id int NOT NULL auto_increment, 
+            asin text,
+            text text,
+            title text,
+            location text,
+            date date,
+            verified bool, 
+            rating int,
+            PRIMARY KEY (id)
+        );'''
+    cursor_db.execute(create_review_table_query)
+    
+
+    # create product names table
+    create_product_table_query = '''
+    CREATE TABLE IF NOT EXISTS product_names( 
+            asin VARCHAR(10),
+            product_name text,
+            PRIMARY KEY (asin)
+        );
+    '''
+    cursor_db.execute(create_product_table_query)
+
+
+    conn_db.commit()
+    cursor_db.close()
+    conn_db.close()
+
     app.run(host="0.0.0.0", debug=True)
