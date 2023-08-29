@@ -81,7 +81,9 @@ secrets = {
     'DB_HOST': 'MySQL_Database_Host',
     'DB_PORT': 3306,
     'DB_USER': "admin",
-    'DATABASE': "MySQL_database_name"
+    'DATABASE': "MySQL_database_name",
+    'AWS_BUCKET_REGION': 'AWS_bucket_region',
+    'AWS_BUCKET_NAME': "AWS_bucket_name"
 }
 
 ```

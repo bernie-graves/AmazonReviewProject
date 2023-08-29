@@ -33,10 +33,10 @@ def get_mysql_connection():
 def fetch_wordclouds(asin_to_fetch):
 
     # Create a Boto3 S3 client
-    s3_client = boto3.client('s3', region_name='us-west-1')
+    s3_client = boto3.client('s3', region_name=secrets.get("AWS_BUCKET_REGION"))
 
     # Specify the S3 bucket name
-    bucket_name = 'amazon-product-analysis-objects'
+    bucket_name = secrets.get("AWS_BUCKET_NAME")
 
     # Fetch the image URLs for the specified ASIN
     neg_image_url = s3_client.generate_presigned_url(
@@ -61,10 +61,10 @@ def fetch_wordclouds(asin_to_fetch):
 # function to grab important words from the s3 bucket
 def fetch_important_words_csv(asin):
     # Create a Boto3 S3 client
-    s3_client = boto3.client('s3', region_name='us-west-1')
+    s3_client = boto3.client('s3', region_name=secrets.get("AWS_BUCKET_REGION"))
 
     # Specify the S3 bucket name
-    bucket_name = 'amazon-product-analysis-objects'
+    bucket_name = secrets.get("AWS_BUCKET_NAME")
 
     # Specify the CSV file name based on the ASIN
     file_name = f'important_words_{asin}.csv'
