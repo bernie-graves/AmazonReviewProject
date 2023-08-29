@@ -141,7 +141,48 @@ The dashboard will be running on http://127.0.0.1:8050/
 
 ### MacOS and Linux Startup
 
-linux setup
+Setup on MacOS will be really similar but some of the commands to activate the virtual environments will differ slightly. Open up 3 terminals and run the following. It might take awhile to install the dependencies.
+
+#### REST API
+
+Open a command prompt and run the following commands one at a time to start the API
+
+```bash
+cd amazon-python-scrapy-scraper
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 app.py
+
+```
+
+#### Worker Terminal
+
+```bash
+cd amazon-python-scrapy-scraper
+python3 -m venv worker-venv
+source worker-venv/bin/activate
+pip3 install -r requirements.txt
+sudo service redis-server start
+rq worker
+```
+
+This sets up the virtual environment, starts the task queue and opens a worker on this queue.
+
+#### Dashboard Setup
+
+Now to open the Dash Dashboard. Open a Command Prompt window and run the following:
+
+```bash
+cd amazon-review-dashboard
+python3 -m venv dashboard-venv
+source dashboard-venv/bin/activate
+pip3 install -r requirements.txt
+python3 app.py
+
+```
+
+This creates and activates a virtual environment for the dashboard, installs the dependencies and then starts the dashboard
 
 ## More Details
 
