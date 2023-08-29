@@ -112,7 +112,7 @@ def create_and_upload_wordclouds(df, asin):
 
 
     # Specify the S3 bucket name
-    bucket_name = 'amazon-product-analysis-objects'
+    bucket_name = os.getenv("AWS_BUCKET_NAME")
     # Create a Boto3 S3 client
     s3 = boto3.resource('s3')
 
@@ -227,7 +227,7 @@ def create_and_upload_sentiment_model(df, asin):
 
     # Upload to s3 bucket
     # Specify the S3 bucket name
-    bucket_name = 'amazon-product-analysis-objects'
+    bucket_name = os.getenv("AWS_BUCKET_NAME")
     # Create a Boto3 S3 client
     s3 = boto3.resource('s3')
 

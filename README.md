@@ -69,6 +69,7 @@ MYSQL_PASSWORD='mysql_database_password'
 AWS_ACCESS_KEY_ID=aws_access_key
 AWS_DEFAULT_REGION=aws_region
 AWS_SECRET_ACCESS_KEY=aws_secret_access_key
+AWS_BUCKET_NAME=your-bucket-name
 ```
 
 Create `mysecrets.py` in the `amazon-reviews-dashboard/` directory and replace with your secrets.
@@ -186,8 +187,8 @@ This creates and activates a virtual environment for the dashboard, installs the
 
 ## More Details
 
-The scraper was built on a fork of a repository made by Scrapeops. I edited the spider to parse what I wanted from the reviews. I also had to add a feature to change the review sorting option. Amazon limits products to 10 pages of reviews per sort whihc severly limited the amount of reviews I was able to scrape. To get around this I would change the url to a different sort (1 star reviews, featured reviews, ...) every 10 pages to maximize the number of reivews scraped. I also created the pipeline that sent the parsed data to a MySQL databse as it is being scraped and the pipeline that ran the data science workflows upon completion of the scraping. 
+The scraper was built on a fork of a repository made by Scrapeops. I edited the spider to parse what I wanted from the reviews. I also had to add a feature to change the review sorting option. Amazon limits products to 10 pages of reviews per sort whihc severly limited the amount of reviews I was able to scrape. To get around this I would change the url to a different sort (1 star reviews, featured reviews, ...) every 10 pages to maximize the number of reivews scraped. I also created the pipeline that sent the parsed data to a MySQL databse as it is being scraped and the pipeline that ran the data science workflows upon completion of the scraping.
 
 ## Credits
 
-The inital spider was forked from this [python-scrapy-playbook](https://github.com/python-scrapy-playbook/amazon-python-scrapy-scraper) repository. 
+The inital spider was forked from this [python-scrapy-playbook](https://github.com/python-scrapy-playbook/amazon-python-scrapy-scraper) repository.
