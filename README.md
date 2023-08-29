@@ -68,7 +68,7 @@ MYSQL_PASSWORD='mysql_database_password'
 # aws keys
 AWS_ACCESS_KEY_ID=aws_access_key
 AWS_DEFAULT_REGION=aws_region
-AWS_SECRET_ACCESS_KEY=aws_secret_access_key
+AWS_BUCKET_ACCESS_KEY=aws_secret_access_key
 AWS_BUCKET_NAME=your-bucket-name
 ```
 
@@ -88,7 +88,7 @@ MYSQL_USER='your-db-user'
 
 # aws keys
 AWS_ACCESS_KEY_ID=aws-access-key
-AWS_DEFAULT_REGION=aws-region
+AWS_BUCKET_REGION=aws-region
 AWS_SECRET_ACCESS_KEY=aws-secret-access-key
 AWS_BUCKET_NAME=s3-bucket-name
 

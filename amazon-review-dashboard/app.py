@@ -17,9 +17,9 @@ from PIL import Image
 from io import BytesIO
 
 # for importing environment variables and secrets
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 import os
-load_dotenv()
 
 import mysql.connector
 
@@ -35,8 +35,10 @@ def get_mysql_connection():
 # function to grab the wordclouds from the bucket
 def fetch_wordclouds(asin_to_fetch):
 
+    bucket_region = os.getenv("AWS_BUCKET_REGION")
+    print(f"Bucket Region is {bucket_region}")
     # Create a Boto3 S3 client
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client('s3', region_name=bucket_region)
 
     # Specify the S3 bucket name
     bucket_name = os.getenv("AWS_BUCKET_NAME")
@@ -63,8 +65,11 @@ def fetch_wordclouds(asin_to_fetch):
 
 # function to grab important words from the s3 bucket
 def fetch_important_words_csv(asin):
+
+    load_dotenv()
+
     # Create a Boto3 S3 client
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client('s3', region_name=os.getenv("AWS_BUCKET_REGION"))
 
     # Specify the S3 bucket name
     bucket_name = os.getenv("AWS_BUCKET_NAME")

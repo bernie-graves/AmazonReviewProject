@@ -114,7 +114,7 @@ def create_and_upload_wordclouds(df, asin):
     # Specify the S3 bucket name
     bucket_name = os.getenv("AWS_BUCKET_NAME")
     # Create a Boto3 S3 client
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource('s3', region_name=os.getenv("AWS_BUCKET_REGION"))
 
     # Create Positive Wordcloud
     positive_reviews = df[df["rating"] > 3]
@@ -229,7 +229,7 @@ def create_and_upload_sentiment_model(df, asin):
     # Specify the S3 bucket name
     bucket_name = os.getenv("AWS_BUCKET_NAME")
     # Create a Boto3 S3 client
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource('s3', region_name=os.getenv("AWS_BUCKET_REGION"))
 
 
     key = f'important_words_{asin}.csv'

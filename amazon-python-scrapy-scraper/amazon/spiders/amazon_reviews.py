@@ -124,7 +124,7 @@ class AmazonReviewsSpider(scrapy.Spider):
 
         # after 10 pages amazon disables next page of reviews
         # work around: sort by stars after these 10 pages get ~100 extra reviews pper new sort
-        elif self.current_sort < 2:
+        elif self.current_sort < 10:
             self.current_sort += 1
             # get url for sorted reviews to get extra reviews
             url_stars_sorted = f"https://www.amazon.com/product-reviews/{asin}/?{self.sorting_options[self.current_sort]}"
