@@ -24,7 +24,7 @@ This app consists of two main pieces. The frontend dashboard built with the Pyth
 
 The dashboard displays feature importances from a sentiment model trained on the selected product's reviews. This tells us which words are specifically contributing to a review being classified as negative or positive. It also features graphics to display the number of reviews scraped for this product and the number of reviews over time grouped by the rating. The bottom half of the dashboard shows two wordclouds created by subsetting the data by positive and negative reviews. The larger the word, the more prevalent it is in those type of reviews. Combined, these figures help to identify pain points and pleasure points in the selected product.
 
-The frontend also features buttons which make it easy to request a new product to be scraped or to scrape additional reviews for the selected product. by submitting these forms, you make a request to the backend REST API that starts a scraping task.
+The frontend also features buttons which make it easy to request a new product to be scraped or to scrape additional reviews for the selected product. By submitting these forms, you make a request to the backend REST API that starts a scraping task.
 
 ![screenshot of scrape form](assets/scrape-request-form.png)
 
