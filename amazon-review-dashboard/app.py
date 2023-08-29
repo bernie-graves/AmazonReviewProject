@@ -33,7 +33,10 @@ def get_mysql_connection():
 def fetch_wordclouds(asin_to_fetch):
 
     # Create a Boto3 S3 client
-    s3_client = boto3.client('s3', region_name=secrets.get("AWS_BUCKET_REGION"))
+    s3_client = boto3.client('s3',
+                            aws_access_key_id=secrets.get("AWS_ACCESS_KEY"),
+                            aws_secret_access_key=secrets.get("AWS_SECRET_ACCESS_KEY"),
+                            region_name=secrets.get("AWS_BUCKET_REGION"))
 
     # Specify the S3 bucket name
     bucket_name = secrets.get("AWS_BUCKET_NAME")
@@ -61,7 +64,10 @@ def fetch_wordclouds(asin_to_fetch):
 # function to grab important words from the s3 bucket
 def fetch_important_words_csv(asin):
     # Create a Boto3 S3 client
-    s3_client = boto3.client('s3', region_name=secrets.get("AWS_BUCKET_REGION"))
+    s3_client = boto3.client('s3',
+                            aws_access_key_id=secrets.get("AWS_ACCESS_KEY"),
+                            aws_secret_access_key=secrets.get("AWS_SECRET_ACCESS_KEY"),
+                            region_name=secrets.get("AWS_BUCKET_REGION"))
 
     # Specify the S3 bucket name
     bucket_name = secrets.get("AWS_BUCKET_NAME")

@@ -38,7 +38,7 @@ Before starting, clone the repository locally.
 
 ### 1.) Database Setup
 
-The first step is to setup a MySQL database. Note the database name, host, the mmaster user, the password. I used AWS RDS to host mine (see setup [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Tutorials.WebServerDB.CreateDBInstance.html)) but a locally hosted MySQL database should work too.
+The first step is to setup a MySQL database. Note the database name, host, the mmaster user, the password. I used AWS RDS to host mine (see setup [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Tutorials.WebServerDB.CreateDBInstance.html)) but a locally hosted MySQL database should work too. If using AWS RDS, make sure to set `Publically accessible` to Yes.
 
 ### 2.) AWS S3 Bucket Setup
 
@@ -83,10 +83,14 @@ secrets = {
     'DB_USER': "admin",
     'DATABASE': "MySQL_database_name",
     'AWS_BUCKET_REGION': 'AWS_bucket_region',
-    'AWS_BUCKET_NAME': "AWS_bucket_name"
+    'AWS_BUCKET_NAME': "AWS_bucket_name",
+    'AWS_ACCESS_KEY': "AWS_access_key",
+    'AWS_SECRET_ACCESS_KEY': "AWS_secret_access_key"
 }
 
 ```
+
+# REAL ONENNNNNN
 
 ### Windows Startup
 
