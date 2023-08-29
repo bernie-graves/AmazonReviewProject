@@ -90,8 +90,6 @@ secrets = {
 
 ```
 
-# REAL ONENNNNNN
-
 ### Windows Startup
 
 Windows quickstart
