@@ -72,22 +72,25 @@ AWS_SECRET_ACCESS_KEY=aws_secret_access_key
 AWS_BUCKET_NAME=your-bucket-name
 ```
 
-Create `mysecrets.py` in the `amazon-reviews-dashboard/` directory and replace with your secrets.
+Create `.env` in the `amazon-reviews-dashboard/` directory and replace with your secrets.
 
-```python
-# amazon-python-dashboard/mysecrets.py
+```env
+# amazon-review-dashboard/.env
 
-secrets = {
-    'DB_PASSWORD': 'MySQL_Password',
-    'DB_HOST': 'MySQL_Database_Host',
-    'DB_PORT': 3306,
-    'DB_USER': "admin",
-    'DATABASE': "MySQL_database_name",
-    'AWS_BUCKET_REGION': 'AWS_bucket_region',
-    'AWS_BUCKET_NAME': "AWS_bucket_name",
-    'AWS_ACCESS_KEY': "AWS_access_key",
-    'AWS_SECRET_ACCESS_KEY': "AWS_secret_access_key"
-}
+SCRAPE_OPS_API_KEY='your-scrapeops-api-key'
+
+# database secrets-
+MYSQL_HOST='your-mysql-db-host'
+MSQL_DATABASE='your-db-name'
+MYSQL_PASSWORD='your-db-password'
+MYSQL_USER='your-db-user'
+
+
+# aws keys
+AWS_ACCESS_KEY_ID=aws-access-key
+AWS_DEFAULT_REGION=aws-region
+AWS_SECRET_ACCESS_KEY=aws-secret-access-key
+AWS_BUCKET_NAME=s3-bucket-name
 
 ```
 

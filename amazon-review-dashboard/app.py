@@ -16,20 +16,19 @@ import boto3
 from PIL import Image
 from io import BytesIO
 
-# for connecting to mySQL db
-from mysecrets import secrets
+# for importing environment variables and secrets
 from dotenv import load_dotenv
 import os
-
 load_dotenv()
+
 import mysql.connector
 
 def get_mysql_connection():
     connection = mysql.connector.connect(
-        host=secrets.get("DB_HOST"),
-        user=secrets.get("DB_USER"),
-        password=secrets.get("DB_PASSWORD"),
-        database=secrets.get("DATABASE")
+        host=os.getenv("MYSQL_HOST"),
+        user=os.getenv("MYSQL_USER"),
+        password=os.getenv("MYSQL_PASSWORD"),
+        database=os.getenv("MSQL_DATABASE")
     )
     return connection
 
@@ -37,12 +36,10 @@ def get_mysql_connection():
 def fetch_wordclouds(asin_to_fetch):
 
     # Create a Boto3 S3 client
-    s3_client = boto3.client('s3',
-                            aws_access_key_id=secrets.get("AWS_ACCESS_KEY"),
-                            aws_secret_access_key=secrets.get("AWS_SECRET_ACCESS_KEY"))
+    s3_client = boto3.client('s3')
 
     # Specify the S3 bucket name
-    bucket_name = secrets.get("AWS_BUCKET_NAME")
+    bucket_name = os.getenv("AWS_BUCKET_NAME")
 
     # Fetch the image URLs for the specified ASIN
     neg_image_url = s3_client.generate_presigned_url(
@@ -67,12 +64,10 @@ def fetch_wordclouds(asin_to_fetch):
 # function to grab important words from the s3 bucket
 def fetch_important_words_csv(asin):
     # Create a Boto3 S3 client
-    s3_client = boto3.client('s3',
-                            aws_access_key_id=secrets.get("AWS_ACCESS_KEY"),
-                            aws_secret_access_key=secrets.get("AWS_SECRET_ACCESS_KEY"))
+    s3_client = boto3.client('s3')
 
     # Specify the S3 bucket name
-    bucket_name = secrets.get("AWS_BUCKET_NAME")
+    bucket_name = os.getenv("AWS_BUCKET_NAME")
 
     # Specify the CSV file name based on the ASIN
     file_name = f'important_words_{asin}.csv'
