@@ -82,10 +82,10 @@ secrets = {
     'DB_PORT': 3306,
     'DB_USER': "admin",
     'DATABASE': "MySQL_database_name",
-    'AWS_BUCKET_REGION': '',
-    'AWS_BUCKET_NAME': "",
-    'AWS_ACCESS_KEY': "",
-    'AWS_SECRET_ACCESS_KEY': ""
+    'AWS_BUCKET_REGION': 'AWS_bucket_region',
+    'AWS_BUCKET_NAME': "AWS_bucket_name",
+    'AWS_ACCESS_KEY': "AWS_access_key",
+    'AWS_SECRET_ACCESS_KEY': "AWS_secret_access_key"
 }
 
 ```
