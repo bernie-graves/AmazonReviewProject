@@ -141,11 +141,11 @@ The dashboard will be running on http://127.0.0.1:8050/
 
 ### MacOS and Linux Startup
 
-Setup on MacOS will be really similar but some of the commands to activate the virtual environments will differ slightly. Open up 3 terminals and run the following.
+Setup on MacOS will be really similar but some of the commands to activate the virtual environments will differ slightly. Open up 3 terminals and run the following. It might take awhile to install the dependencies.
 
 #### REST API
 
-Open a command prompt and run the following commands to start the API
+Open a command prompt and run the following commands one at a time to start the API
 
 ```bash
 cd amazon-python-scrapy-scraper

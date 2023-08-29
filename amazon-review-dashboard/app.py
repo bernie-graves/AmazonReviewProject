@@ -341,7 +341,7 @@ def submit_form(n_clicks, asin_value, product_name):
         except Exception as e:
             result_icon_class = "fas fa-exclamation-triangle"  # Exclamation triangle icon for exceptions
             result_message = "Failed to connect to server"
-            print("Exception:", str(e))  # Print the exception message for debugging
+            print("Exception:", str(e)) # Print the exception message for debugging
 
         return loading_icon_class, result_icon_class, result_message
 
@@ -567,8 +567,7 @@ def update_important_words(asin):
 @app.callback(
     [Output('ratings-graph', 'children'),
      Output('review-count', 'children')],
-    [Input('product-dropdown', 'value')]
-)   
+    [Input('product-dropdown', 'value')])
 def update_ratings_graph(asin):
     reviews_df = fetch_reviews(asin=asin)
 
@@ -587,10 +586,6 @@ def update_ratings_graph(asin):
                                      CircularComponent(len(reviews_df))]) 
     return graph, review_count_display
 
-
-
-
 # Run the Dash app
 if __name__ == '__main__':
     app.run_server(debug=True)
-
