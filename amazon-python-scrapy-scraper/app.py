@@ -13,7 +13,6 @@ from scrapy.signalmanager import dispatcher
 from scrapy import cmdline
 from twisted.internet import reactor
 from scrapy import signals
-from amazon.mysecrets import secrets
 import mysql.connector
 
 ## imports for celery -- task queue
